@@ -34,11 +34,8 @@ client.on('message', message => {
       var cmd = args[0];
       args = args.splice(1);
       switch(cmd) {
-            case 'ping':
-                message.channel.send('pong');
-                break;
-            case 'user':
-                message.channel.send('Hello ' + mention(message.author.username));
+            case 'hello':
+                message.channel.send(`Hello Comrade ${message.author}!`);
                 break;
             case 'timezone':
                 var zone = parseInt(args[0]);
@@ -48,14 +45,15 @@ client.on('message', message => {
   }
 });
 
+// Create an event listener for new guild members
 client.on('guildMemberAdd', member => {
-    var message = 'Welcome to the SocLit\'s Virtual Book Group, Comrade ' + mention(member.user.id + '!');
-
+  // Send the message to a designated channel on a server:
+  const channel = member.guild.channels.cache.find(ch => ch.name === 'general');
+  // Do nothing if the channel wasn't found on this server
+  if (!channel) return;
+  // Send the message, mentioning the member
+  channel.send(`Welcome to the SocLit's Virtual Book Group, Comrade ${member}! Join the Revolution!`);
 });
-
-function mention(name){
-    return "<@" + name + ">";
-}
 
 function timezone(offset, channel, member){
     if (!Number.isNaN(offset) && offset >= -12 && offset <= 14) {
@@ -94,10 +92,6 @@ function timezone(offset, channel, member){
     }
 }
 
-function replaceRole(member, old_role, new_role){
-    member.roles.remove(old_role)
-        .then(m => m.roles.add(new_role));
-}
 
 function getRoleByName(name, roles=guild.roles.cache, partial=false){
     for (const id of roles.keys()) {
